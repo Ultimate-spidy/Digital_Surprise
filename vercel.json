@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run build:frontend",
+  "outputDirectory": "dist/public",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "env": {
+    "VITE_API_BASE_URL": "https://digital-surprise.up.railway.app"
+  }
+}

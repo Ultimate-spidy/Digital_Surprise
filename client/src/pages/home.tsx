@@ -49,7 +49,7 @@ export default function Home() {
         formData.append('password', data.password);
       }
 
-      const response = await fetch('/api/surprises', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/surprises`, {
         method: 'POST',
         body: formData,
       });

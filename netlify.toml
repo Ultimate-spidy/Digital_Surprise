@@ -1,0 +1,11 @@
+[build]
+  publish = "dist/public"
+  command = "npm run build:frontend"
+
+[build.environment]
+  VITE_API_BASE_URL = "https://digital-surprise.up.railway.app"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
