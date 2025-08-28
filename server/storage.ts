@@ -1,10 +1,6 @@
 import { type Surprise, type InsertSurprise, surprises } from "@shared/schema";
-import { randomUUID } from "crypto";
 import { createHash } from "crypto";
-import path from "path";
-import fs from "fs";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
@@ -16,64 +12,29 @@ export interface IStorage {
   verifyPassword(password: string, hash: string): boolean;
 }
 
-export class SqliteStorage implements IStorage {
-  private db;
-  private drizzleDb;
+export class DatabaseStorage implements IStorage {
   private files: Map<string, Buffer>;
 
   constructor() {
-    // Initialize SQLite database
-    this.db = new Database("database.db");
-    this.drizzleDb = drizzle(this.db);
     this.files = new Map();
-    
-    // Create tables if they don't exist
-    this.initDatabase();
-    
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-  }
-
-  private initDatabase() {
-    // Create surprises table if it doesn't exist
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS surprises (
-        id TEXT PRIMARY KEY,
-        slug TEXT NOT NULL UNIQUE,
-        filename TEXT NOT NULL,
-        original_name TEXT NOT NULL,
-        mime_type TEXT NOT NULL,
-        message TEXT NOT NULL,
-        password TEXT,
-        created_at INTEGER NOT NULL DEFAULT (unixepoch())
-      )
-    `);
   }
 
   async createSurprise(insertSurprise: InsertSurprise): Promise<Surprise> {
-    const id = randomUUID();
-    const surprise: Surprise = {
-      ...insertSurprise,
-      id,
-      password: insertSurprise.password || null,
-      createdAt: new Date(),
-    };
-    
-    await this.drizzleDb.insert(surprises).values(surprise);
+    const [surprise] = await db
+      .insert(surprises)
+      .values(insertSurprise)
+      .returning();
     return surprise;
   }
 
   async getSurpriseBySlug(slug: string): Promise<Surprise | undefined> {
-    const result = await this.drizzleDb
+    const [surprise] = await db
       .select()
       .from(surprises)
       .where(eq(surprises.slug, slug))
       .limit(1);
     
-    return result[0] || undefined;
+    return surprise || undefined;
   }
 
   async saveFile(buffer: Buffer, filename: string): Promise<string> {
@@ -98,4 +59,4 @@ export class SqliteStorage implements IStorage {
   }
 }
 
-export const storage = new SqliteStorage();
+export const storage = new DatabaseStorage();

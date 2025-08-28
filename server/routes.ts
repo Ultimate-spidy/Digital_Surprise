@@ -12,6 +12,20 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // API status route  
+  app.get("/api", (req, res) => {
+    res.json({ 
+      message: "Digital Surprise Sharing API", 
+      status: "running",
+      endpoints: {
+        "POST /api/surprises": "Create a new surprise",
+        "GET /api/surprises/:slug": "Get surprise by slug",
+        "POST /api/surprises/:slug/verify-password": "Verify password for protected surprise",
+        "GET /api/files/:filename": "Get uploaded file"
+      }
+    });
+  });
+
   // Create a surprise
   app.post("/api/surprises", upload.single('file'), async (req, res) => {
     try {

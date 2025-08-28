@@ -1,17 +1,17 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const surprises = sqliteTable("surprises", {
-  id: text("id").primaryKey(),
+export const surprises = pgTable("surprises", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   slug: text("slug").notNull().unique(),
   filename: text("filename").notNull(),
   originalName: text("original_name").notNull(),
   mimeType: text("mime_type").notNull(),
   message: text("message").notNull(),
   password: text("password"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(unixepoch())`).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const insertSurpriseSchema = createInsertSchema(surprises).omit({
