@@ -49,8 +49,8 @@ export default function Home() {
         formData.append('password', data.password);
       }
 
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
-      const apiUrl = apiBaseUrl ? `${apiBaseUrl}/api/surprises` : '/api/surprises';
+      const isDev = import.meta.env.DEV;
+      const apiUrl = isDev ? '/api/surprises' : `${import.meta.env.VITE_API_BASE_URL || ''}/api/surprises`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
