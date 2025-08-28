@@ -131,37 +131,40 @@ export default function Surprise() {
               <p className="text-xl text-muted-foreground">Someone special created this just for you!</p>
             </div>
 
-            {/* Media Display */}
+            {/* Media and Message Display - Side by Side */}
             <div className="celebration-card rounded-2xl p-8 mb-8">
-              <div className="surprise-frame rounded-xl overflow-hidden mb-6" data-testid="media-container">
-                {surprise.mimeType?.startsWith('image/') ? (
-                  <img
-                    src={`/api/files/${surprise.filename}`}
-                    alt="Surprise media"
-                    className="w-full h-96 object-cover"
-                    data-testid="surprise-image"
-                  />
-                ) : (
-                  <video
-                    src={`/api/files/${surprise.filename}`}
-                    className="w-full h-96 object-cover"
-                    controls
-                    data-testid="surprise-video"
-                  />
-                )}
-              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                {/* Media Display */}
+                <div className="surprise-frame rounded-xl overflow-hidden flex justify-center" data-testid="media-container">
+                  {surprise.mimeType?.startsWith('image/') ? (
+                    <img
+                      src={`/api/files/${surprise.filename}`}
+                      alt="Surprise media"
+                      className="max-w-full max-h-[600px] object-contain"
+                      data-testid="surprise-image"
+                    />
+                  ) : (
+                    <video
+                      src={`/api/files/${surprise.filename}`}
+                      className="max-w-full max-h-[600px] object-contain"
+                      controls
+                      data-testid="surprise-video"
+                    />
+                  )}
+                </div>
 
-              {/* Message Display */}
-              <div className="text-center">
-                <div className="text-4xl mb-4">💝</div>
-                <h2 className="text-2xl font-bold gradient-text mb-4">A Special Message for You</h2>
-                <div className="bg-muted rounded-xl p-6">
-                  <p className="text-lg leading-relaxed text-foreground" data-testid="surprise-message">
-                    {surprise.message}
-                  </p>
-                  <div className="text-sm text-muted-foreground mt-4">
-                    <Heart className="inline w-4 h-4 mr-1 text-secondary" />
-                    Created with love
+                {/* Message Display */}
+                <div className="text-center lg:text-left">
+                  <div className="text-4xl mb-4">💝</div>
+                  <h2 className="text-2xl font-bold gradient-text mb-4">A Special Message for You</h2>
+                  <div className="bg-muted rounded-xl p-6">
+                    <p className="text-lg leading-relaxed text-foreground" data-testid="surprise-message">
+                      {surprise.message}
+                    </p>
+                    <div className="text-sm text-muted-foreground mt-4">
+                      <Heart className="inline w-4 h-4 mr-1 text-secondary" />
+                      Created with love
+                    </div>
                   </div>
                 </div>
               </div>
