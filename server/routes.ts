@@ -46,10 +46,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const surprise = await storage.createSurprise(surpriseData);
       
-      // Generate QR code
-      const baseUrl = process.env.REPLIT_DOMAIN || `http://localhost:${process.env.PORT || 5000}`;
+      // Generate QR code - optimized for speed
+      const baseUrl = process.env.REPLIT_DOMAIN ? `https://${process.env.REPLIT_DOMAIN}` : `http://localhost:${process.env.PORT || 5000}`;
       const surpriseUrl = `${baseUrl}/surprise/${slug}`;
-      const qrCodeDataUrl = await QRCode.toDataURL(surpriseUrl);
+      const qrCodeDataUrl = await QRCode.toDataURL(surpriseUrl, {
+        width: 200,
+        margin: 2,
+        errorCorrectionLevel: 'L',
+        type: 'png'
+      });
 
       res.json({
         id: surprise.id,
