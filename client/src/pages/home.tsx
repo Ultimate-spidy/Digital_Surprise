@@ -50,7 +50,7 @@ export default function Home() {
       }
 
       const isDev = import.meta.env.DEV;
-      const apiUrl = isDev ? '/api/surprises' : `${import.meta.env.VITE_API_BASE_URL || ''}/api/surprises`;
+      const apiUrl = isDev ? '/api/surprises' : 'https://digitalsurprise-production.up.railway.app/api/surprises';
       const response = await fetch(apiUrl, {
         method: 'POST',
         body: formData,
