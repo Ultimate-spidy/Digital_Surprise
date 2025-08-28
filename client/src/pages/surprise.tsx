@@ -57,7 +57,8 @@ export default function Surprise() {
   const handleDownload = () => {
     if (surprise?.filename) {
       const link = document.createElement('a');
-      link.href = `${import.meta.env.VITE_API_BASE_URL || ''}/api/files/${surprise.filename}`;
+      const isDevelopment = import.meta.env.DEV;
+      link.href = isDevelopment ? `/api/files/${surprise.filename}` : `${import.meta.env.VITE_API_BASE_URL || ''}/api/files/${surprise.filename}`;
       link.download = surprise.originalName || 'surprise-media';
       document.body.appendChild(link);
       link.click();
@@ -138,14 +139,14 @@ export default function Surprise() {
                 <div className="surprise-frame rounded-xl overflow-hidden flex justify-center" data-testid="media-container">
                   {surprise.mimeType?.startsWith('image/') ? (
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL || ''}/api/files/${surprise.filename}`}
+                      src={import.meta.env.DEV ? `/api/files/${surprise.filename}` : `${import.meta.env.VITE_API_BASE_URL || ''}/api/files/${surprise.filename}`}
                       alt="Surprise media"
                       className="max-w-full max-h-[600px] object-contain"
                       data-testid="surprise-image"
                     />
                   ) : (
                     <video
-                      src={`${import.meta.env.VITE_API_BASE_URL || ''}/api/files/${surprise.filename}`}
+                      src={import.meta.env.DEV ? `/api/files/${surprise.filename}` : `${import.meta.env.VITE_API_BASE_URL || ''}/api/files/${surprise.filename}`}
                       className="max-w-full max-h-[600px] object-contain"
                       controls
                       data-testid="surprise-video"
