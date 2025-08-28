@@ -3,7 +3,7 @@
   command = "vite build"
 
 [build.environment]
-  VITE_API_BASE_URL = "https://digital-surprise.up.railway.app"
+  VITE_API_BASE_URL = "https://digitalsurprise-production.up.railway.app"
 
 [[redirects]]
   from = "/*"
