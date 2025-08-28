@@ -14,9 +14,8 @@ export async function apiRequest(
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  // In development mode, use relative URLs. In production, use the base URL.
-  const isDevelopment = import.meta.env.DEV;
-  const fullUrl = isDevelopment ? url : (url.startsWith('/') ? `${API_BASE_URL}${url}` : url);
+  // If we have an API_BASE_URL, use it. Otherwise use relative URLs (local dev).
+  const fullUrl = API_BASE_URL && url.startsWith('/') ? `${API_BASE_URL}${url}` : url;
   
   const res = await fetch(fullUrl, {
     method,
@@ -36,9 +35,8 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const url = queryKey.join("/") as string;
-    // In development mode, use relative URLs. In production, use the base URL.
-    const isDevelopment = import.meta.env.DEV;
-    const fullUrl = isDevelopment ? url : (url.startsWith('/') ? `${API_BASE_URL}${url}` : url);
+    // If we have an API_BASE_URL, use it. Otherwise use relative URLs (local dev).
+    const fullUrl = API_BASE_URL && url.startsWith('/') ? `${API_BASE_URL}${url}` : url;
     
     const res = await fetch(fullUrl, {
       credentials: "include",
