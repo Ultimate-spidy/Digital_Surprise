@@ -1,8 +1,11 @@
-import { type Surprise, type InsertSurprise } from "@shared/schema";
+import { type Surprise, type InsertSurprise, surprises } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { createHash } from "crypto";
 import path from "path";
 import fs from "fs";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   createSurprise(surprise: InsertSurprise): Promise<Surprise>;
@@ -13,19 +16,41 @@ export interface IStorage {
   verifyPassword(password: string, hash: string): boolean;
 }
 
-export class MemStorage implements IStorage {
-  private surprises: Map<string, Surprise>;
+export class SqliteStorage implements IStorage {
+  private db;
+  private drizzleDb;
   private files: Map<string, Buffer>;
 
   constructor() {
-    this.surprises = new Map();
+    // Initialize SQLite database
+    this.db = new Database("database.db");
+    this.drizzleDb = drizzle(this.db);
     this.files = new Map();
+    
+    // Create tables if they don't exist
+    this.initDatabase();
     
     // Ensure uploads directory exists
     const uploadsDir = path.join(process.cwd(), 'uploads');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
+  }
+
+  private initDatabase() {
+    // Create surprises table if it doesn't exist
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS surprises (
+        id TEXT PRIMARY KEY,
+        slug TEXT NOT NULL UNIQUE,
+        filename TEXT NOT NULL,
+        original_name TEXT NOT NULL,
+        mime_type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        password TEXT,
+        created_at INTEGER NOT NULL DEFAULT (unixepoch())
+      )
+    `);
   }
 
   async createSurprise(insertSurprise: InsertSurprise): Promise<Surprise> {
@@ -36,14 +61,19 @@ export class MemStorage implements IStorage {
       password: insertSurprise.password || null,
       createdAt: new Date(),
     };
-    this.surprises.set(id, surprise);
+    
+    await this.drizzleDb.insert(surprises).values(surprise);
     return surprise;
   }
 
   async getSurpriseBySlug(slug: string): Promise<Surprise | undefined> {
-    return Array.from(this.surprises.values()).find(
-      (surprise) => surprise.slug === slug
-    );
+    const result = await this.drizzleDb
+      .select()
+      .from(surprises)
+      .where(eq(surprises.slug, slug))
+      .limit(1);
+    
+    return result[0] || undefined;
   }
 
   async saveFile(buffer: Buffer, filename: string): Promise<string> {
@@ -68,4 +98,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new SqliteStorage();

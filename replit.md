@@ -26,10 +26,11 @@ Preferred communication style: Simple, everyday language.
 - **Development Setup**: Vite middleware integration for hot module replacement in development
 
 ### Data Storage Solutions
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Schema Management**: Drizzle Kit for migrations and schema synchronization
+- **Database**: SQLite with better-sqlite3 driver and Drizzle ORM for type-safe database operations
+- **Schema Management**: Automatic table creation with raw SQL initialization
+- **Data Persistence**: All surprises stored in `database.db` file for persistence across restarts
 - **File Storage**: In-memory storage for files with local filesystem fallback
-- **Session Storage**: PostgreSQL session store with connect-pg-simple
+- **Session Storage**: In-memory session storage
 
 ### Authentication and Security
 - **Password Protection**: Optional bcrypt-style password hashing for surprise access
@@ -38,7 +39,7 @@ Preferred communication style: Simple, everyday language.
 - **Unique Identifiers**: Nanoid for generating URL-safe unique slugs
 
 ### External Dependencies
-- **Database Provider**: Neon Database (serverless PostgreSQL)
+- **Database**: SQLite with better-sqlite3 for local file-based persistence
 - **QR Code Generation**: QRCode library for generating shareable QR codes
 - **Font Loading**: Google Fonts integration for typography
 - **Development Tools**: Replit-specific plugins for enhanced development experience
