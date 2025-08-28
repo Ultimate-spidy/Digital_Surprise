@@ -52,8 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const qrCodeDataUrl = await QRCode.toDataURL(surpriseUrl, {
         width: 200,
         margin: 2,
-        errorCorrectionLevel: 'L',
-        type: 'png'
+        errorCorrectionLevel: 'L'
       });
 
       res.json({

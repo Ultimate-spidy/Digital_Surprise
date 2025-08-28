@@ -66,7 +66,12 @@ export default function Home() {
         title: "🎉 Surprise Created!",
         description: "Your magical surprise is ready to share!",
       });
-      setLocation(`/success/${data.id}`);
+      // Pass data via URL parameters so success page can display it
+      const params = new URLSearchParams({
+        slug: data.slug,
+        qrCode: data.qrCode
+      });
+      setLocation(`/success/${data.id}?${params.toString()}`);
     },
     onError: (error: Error) => {
       toast({
