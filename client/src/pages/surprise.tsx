@@ -7,6 +7,17 @@ import ConfettiOverlay from "@/components/confetti-overlay";
 import { Download, Plus, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+type SurpriseData = {
+  id: string;
+  slug: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  message: string;
+  hasPassword: boolean;
+  createdAt: string;
+};
+
 export default function Surprise() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -24,7 +35,7 @@ export default function Surprise() {
     }
   }, []);
 
-  const { data: surprise, isLoading, error } = useQuery({
+  const { data: surprise, isLoading, error } = useQuery<SurpriseData>({
     queryKey: ['/api/surprises', slug],
     enabled: !!slug,
   });

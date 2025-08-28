@@ -33,6 +33,7 @@ export class MemStorage implements IStorage {
     const surprise: Surprise = {
       ...insertSurprise,
       id,
+      password: insertSurprise.password || null,
       createdAt: new Date(),
     };
     this.surprises.set(id, surprise);
