@@ -15,6 +15,8 @@ app.use(
   }),
 );
 
+app.options("*", cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -48,7 +50,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.options("*", cors());
+
 
 (async () => {
   const server = await registerRoutes(app);
