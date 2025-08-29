@@ -5,11 +5,15 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-// Enable CORS for all routes
-app.use(cors({
-  origin: true, // Allow any origin in development, configure for production
-  credentials: true
-}));
+app.use(
+  cors({
+    origin:
+      "https://digital-surprise-thgwbvzyc-khushi-singhs-projects-24cb0c07.vercel.app",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -44,6 +48,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.options("*", cors());
+
 (async () => {
   const server = await registerRoutes(app);
 
@@ -68,12 +74,15 @@ app.use((req, res, next) => {
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen(
+    {
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    },
+    () => {
+      log(`serving on port ${port}`);
+    },
+  );
 })();
