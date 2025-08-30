@@ -7,7 +7,9 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://digitalsurprise-production.up.railway.app';
+const API_BASE_URL = import.meta.env.DEV 
+  ? "/api" 
+  : "https://digitalsurprise-production.up.railway.app/api";
 
 export async function apiRequest(
   method: string,
@@ -17,7 +19,7 @@ export async function apiRequest(
   // In development, always use relative URLs. In production, use Railway backend.
   const isDev = import.meta.env.DEV;
   const fullUrl = isDev ? url : `${API_BASE_URL}${url}`;
-  
+
   const res = await fetch(fullUrl, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
@@ -39,7 +41,7 @@ export const getQueryFn: <T>(options: {
     // In development, always use relative URLs. In production, use Railway backend.
     const isDev = import.meta.env.DEV;
     const fullUrl = isDev ? url : `${API_BASE_URL}${url}`;
-    
+
     const res = await fetch(fullUrl, {
       credentials: "include",
     });
