@@ -9,7 +9,7 @@ export default defineConfig({
   schema: "./shared/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: "postgresql://postgres:vNQuVxmPjKrvwJpSnZFUpVWhtrmVMVBF@metro.proxy.rlwy.net:31899/railway",
   },
 });
 
