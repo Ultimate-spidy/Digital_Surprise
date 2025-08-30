@@ -46,16 +46,21 @@ export class DatabaseStorage implements IStorage {
     originalName: string,
     mimeType: string,
   ): Promise<string> {
-    // Convert buffer to base64 string for Cloudinary
-    const base64 = buffer.toString("base64");
-    const uploadStr = `data:${mimeType};base64,${base64}`;
+    try {
+      // Convert buffer to base64 string for Cloudinary
+      const base64 = buffer.toString("base64");
+      const uploadStr = `data:${mimeType};base64,${base64}`;
 
-    const result = await cloudinary.uploader.upload(uploadStr, {
-      public_id: originalName, // or use a slug for uniqueness
-      resource_type: "auto", // auto-detect image/video
-      overwrite: true,
-    });
-    return result.secure_url; // public file URL
+      const result = await cloudinary.uploader.upload(uploadStr, {
+        public_id: originalName, // or use a slug for uniqueness
+        resource_type: "auto", // auto-detect image/video
+        overwrite: true,
+      });
+      return result.secure_url; // public file URL
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw error;
+    }
   }
 
   async hashPassword(password: string): Promise<string> {
