@@ -68,7 +68,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async verifyPassword(password: string, hash: string): Promise<boolean> {
-    return this.hashPassword(password) === hash;
+    const hashedInput = await this.hashPassword(password);
+    return hashedInput === hash;
   }
 }
 
