@@ -4,9 +4,10 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { v2 as cloudinary } from "cloudinary";
 
+// Updated Cloudinary config with new api_key
 cloudinary.config({
   cloud_name: "<cloud_name>", // from your dashboard
-  api_key: "digitalSurprise", // from your dashboard
+  api_key: "<api_key>", // <-- updated as requested
   api_secret: "<api_secret>", // from your dashboard
 });
 
