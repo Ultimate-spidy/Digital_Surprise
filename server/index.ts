@@ -5,14 +5,15 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    "https://digital-surprise.vercel.app",
-    "http://localhost:5173",
-    "https://your-actual-vercel-url.vercel.app" // Replace with your actual Vercel URL
-  ],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "https://digital-surprise.vercel.app",
+      "https:digital-surprise-khushi-singhs-projects-24cb0c07.vercel.app", // Replace with your actual Vercel URL
+    ],
+    credentials: true,
+  }),
+);
 
 app.options("*", cors());
 
@@ -48,8 +49,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
-
 
 (async () => {
   const server = await registerRoutes(app);
