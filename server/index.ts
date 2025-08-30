@@ -8,8 +8,7 @@ const app = express();
 app.use(
   cors({
     origin: [
-      "https://digital-surprise.vercel.app",
-      "https:digital-surprise-khushi-singhs-projects-24cb0c07.vercel.app", // Replace with your actual Vercel URL
+      "https://digital-surprise.vercel.app"
     ],
     credentials: true,
   }),
