@@ -5,15 +5,9 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-app.use(
-  cors({
-    origin:
-      "https://digital-surprise-thgwbvzyc-khushi-singhs-projects-24cb0c07.vercel.app",
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  }),
-);
+app.use(cors({
+  origin: "*" // or set to your Vercel domain for more security
+}));
 
 app.options("*", cors());
 

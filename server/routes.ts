@@ -62,15 +62,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         originalName: req.file.originalname,
         mimeType: req.file.mimetype,
         message: message.trim(),
-        password: password ? storage.hashPassword(password) : null,
+        password: password ? await storage.hashPassword(password) : null,
       };
 
       const surprise = await storage.createSurprise(surpriseData);
 
       // Generate QR code - optimized for speed
-      const baseUrl = process.env.REPLIT_DOMAIN
-        ? `https://${process.env.REPLIT_DOMAIN}`
-        : `http://localhost:${process.env.PORT || 5000}`;
+      const baseUrl = process.env.PUBLIC_URL || `https://digitalsurprise-production.up.railway.app`;
+
       const surpriseUrl = `${baseUrl}/surprise/${slug}`;
       const qrCodeDataUrl = await QRCode.toDataURL(surpriseUrl, {
         width: 200,
