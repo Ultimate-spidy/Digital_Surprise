@@ -5,10 +5,15 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
-app.use(cors({
-  origin: "https://digital-surprise.vercel.app",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "https://digital-surprise.vercel.app",
+      "https://digitalsurprise-production-58dd.up.railway.app",
+    ],
+    credentials: true,
+  }),
+);
 
 app.options("*", cors());
 
