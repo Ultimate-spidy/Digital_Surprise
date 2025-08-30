@@ -22,7 +22,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "GET /api/surprises/:slug": "Get surprise by slug",
         "POST /api/surprises/:slug/verify-password":
           "Verify password for protected surprise",
-        "GET /api/files/:filename": "Get uploaded file",
+        // "GET /api/files/:filename": "Get uploaded file", // REMOVE this, no longer needed
       },
     });
   });
@@ -54,11 +54,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const slug = nanoid(12);
       const filename = `${slug}-${Date.now()}${getFileExtension(req.file.originalname)}`;
 
-      await storage.saveFile(req.file.buffer, filename);
+      // Upload to Cloudinary, get public URL
+      const fileUrl = await storage.saveFile(
+        req.file.buffer,
+        filename,
+        req.file.mimetype,
+      );
 
       const surpriseData = {
         slug,
-        filename,
+        filename: fileUrl, // store the Cloudinary URL instead of a filename!
         originalName: req.file.originalname,
         mimeType: req.file.mimetype,
         message: message.trim(),
@@ -68,7 +73,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const surprise = await storage.createSurprise(surpriseData);
 
       // Generate QR code - optimized for speed
-      const baseUrl = process.env.PUBLIC_URL || `https://digitalsurprise-production.up.railway.app`;
+      const baseUrl =
+        process.env.PUBLIC_URL ||
+        `https://digitalsurprise-production.up.railway.app`;
 
       const surpriseUrl = `${baseUrl}/surprise/${slug}`;
       const qrCodeDataUrl = await QRCode.toDataURL(surpriseUrl, {
@@ -83,6 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         shareUrl: surpriseUrl,
         qrCode: qrCodeDataUrl,
         hasPassword: !!surprise.password,
+        fileUrl: fileUrl, // return this Cloudinary URL for frontend use!
       });
     } catch (error) {
       console.error("Error creating surprise:", error);
@@ -106,6 +114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         ...surpriseData,
         hasPassword: !!password,
+        fileUrl: surprise.filename, // filename now contains Cloudinary URL
       });
     } catch (error) {
       console.error("Error fetching surprise:", error);
@@ -135,7 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Password is required" });
       }
 
-      const isValid = storage.verifyPassword(password, surprise.password);
+      const isValid = await storage.verifyPassword(password, surprise.password);
 
       if (!isValid) {
         return res.status(401).json({ message: "Invalid password" });
@@ -148,36 +157,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded files
-  app.get("/api/files/:filename", async (req, res) => {
-    try {
-      const { filename } = req.params;
-      const fileBuffer = await storage.getFileBuffer(filename);
-
-      if (!fileBuffer) {
-        return res.status(404).json({ message: "File not found" });
-      }
-
-      // Set appropriate content type based on file extension
-      const ext = filename.split(".").pop()?.toLowerCase();
-      const mimeTypes: Record<string, string> = {
-        jpg: "image/jpeg",
-        jpeg: "image/jpeg",
-        png: "image/png",
-        gif: "image/gif",
-        webp: "image/webp",
-        mp4: "video/mp4",
-        webm: "video/webm",
-        mov: "video/quicktime",
-      };
-
-      res.set("Content-Type", mimeTypes[ext!] || "application/octet-stream");
-      res.send(fileBuffer);
-    } catch (error) {
-      console.error("Error serving file:", error);
-      res.status(500).json({ message: "Failed to serve file" });
-    }
-  });
+  // REMOVE the /api/files/:filename route!
+  // No need to serve files from backend, Cloudinary does this for you.
 
   const httpServer = createServer(app);
   return httpServer;

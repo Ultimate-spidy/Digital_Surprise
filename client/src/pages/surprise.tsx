@@ -28,15 +28,19 @@ export default function Surprise() {
 
   useEffect(() => {
     const path = window.location.pathname;
-    const pathSegments = path.split('/');
+    const pathSegments = path.split("/");
     const surpriseSlug = pathSegments[pathSegments.length - 1];
     if (surpriseSlug) {
       setSlug(surpriseSlug);
     }
   }, []);
 
-  const { data: surprise, isLoading, error } = useQuery<SurpriseData>({
-    queryKey: ['/api/surprises', slug],
+  const {
+    data: surprise,
+    isLoading,
+    error,
+  } = useQuery<SurpriseData>({
+    queryKey: ["/api/surprises", slug],
     enabled: !!slug,
   });
 
@@ -56,10 +60,9 @@ export default function Surprise() {
 
   const handleDownload = () => {
     if (surprise?.filename) {
-      const link = document.createElement('a');
-      const isDev = import.meta.env.DEV;
-      link.href = isDev ? `/api/files/${surprise.filename}` : `https://digitalsurprise-production.up.railway.app/api/files/${surprise.filename}`;
-      link.download = surprise.originalName || 'surprise-media';
+      const link = document.createElement("a");
+      link.href = surprise.filename; // This is now the Cloudinary URL!
+      link.download = surprise.originalName || "surprise-media";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -67,7 +70,7 @@ export default function Surprise() {
   };
 
   const handleCreateOwn = () => {
-    setLocation('/');
+    setLocation("/");
   };
 
   if (isLoading) {
@@ -75,7 +78,9 @@ export default function Surprise() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce-gentle">🎁</div>
-          <p className="text-lg text-muted-foreground">Loading your surprise...</p>
+          <p className="text-lg text-muted-foreground">
+            Loading your surprise...
+          </p>
         </div>
       </div>
     );
@@ -86,11 +91,13 @@ export default function Surprise() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="celebration-card rounded-2xl p-8 max-w-md text-center">
           <div className="text-6xl mb-4">😕</div>
-          <h2 className="text-2xl font-bold text-foreground mb-4">Surprise Not Found</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            Surprise Not Found
+          </h2>
           <p className="text-muted-foreground mb-6">
             This surprise doesn't exist or may have been removed.
           </p>
-          <Button onClick={() => setLocation('/')} data-testid="go-home-button">
+          <Button onClick={() => setLocation("/")} data-testid="go-home-button">
             Create Your Own Surprise
           </Button>
         </div>
@@ -110,8 +117,12 @@ export default function Surprise() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="celebration-card rounded-2xl p-8 max-w-md text-center">
             <div className="text-6xl mb-4">🔐</div>
-            <h2 className="text-2xl font-bold gradient-text mb-2">Protected Surprise!</h2>
-            <p className="text-muted-foreground">This surprise is password protected</p>
+            <h2 className="text-2xl font-bold gradient-text mb-2">
+              Protected Surprise!
+            </h2>
+            <p className="text-muted-foreground">
+              This surprise is password protected
+            </p>
           </div>
         </div>
       </>
@@ -121,32 +132,39 @@ export default function Surprise() {
   return (
     <>
       <ConfettiOverlay show={showConfetti} />
-      
+
       <main className="relative z-20">
         <div className="container mx-auto px-4 pb-16 pt-8">
           <div className="max-w-4xl mx-auto">
             {/* Celebration Header */}
             <div className="text-center mb-12">
               <div className="text-8xl mb-4 animate-bounce-gentle">🎂</div>
-              <h1 className="text-4xl md:text-6xl font-black gradient-text mb-4">Surprise! 🎉</h1>
-              <p className="text-xl text-muted-foreground">Someone special created this just for you!</p>
+              <h1 className="text-4xl md:text-6xl font-black gradient-text mb-4">
+                Surprise! 🎉
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Someone special created this just for you!
+              </p>
             </div>
 
             {/* Media and Message Display - Side by Side */}
             <div className="celebration-card rounded-2xl p-8 mb-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 {/* Media Display */}
-                <div className="surprise-frame rounded-xl overflow-hidden flex justify-center" data-testid="media-container">
-                  {surprise.mimeType?.startsWith('image/') ? (
+                <div
+                  className="surprise-frame rounded-xl overflow-hidden flex justify-center"
+                  data-testid="media-container"
+                >
+                  {surprise.mimeType?.startsWith("image/") ? (
                     <img
-                      src={import.meta.env.DEV ? `/api/files/${surprise.filename}` : `https://digitalsurprise-production.up.railway.app/api/files/${surprise.filename}`}
+                      src={surprise.filename}
                       alt="Surprise media"
                       className="max-w-full max-h-[600px] object-contain"
                       data-testid="surprise-image"
                     />
                   ) : (
                     <video
-                      src={import.meta.env.DEV ? `/api/files/${surprise.filename}` : `https://digitalsurprise-production.up.railway.app/api/files/${surprise.filename}`}
+                      src={surprise.filename}
                       className="max-w-full max-h-[600px] object-contain"
                       controls
                       data-testid="surprise-video"
@@ -157,9 +175,14 @@ export default function Surprise() {
                 {/* Message Display */}
                 <div className="text-center lg:text-left">
                   <div className="text-4xl mb-4">💝</div>
-                  <h2 className="text-2xl font-bold gradient-text mb-4">A Special Message for You</h2>
+                  <h2 className="text-2xl font-bold gradient-text mb-4">
+                    A Special Message for You
+                  </h2>
                   <div className="bg-muted rounded-xl p-6">
-                    <p className="text-lg leading-relaxed text-foreground" data-testid="surprise-message">
+                    <p
+                      className="text-lg leading-relaxed text-foreground"
+                      data-testid="surprise-message"
+                    >
                       {surprise.message}
                     </p>
                     <div className="text-sm text-muted-foreground mt-4">
@@ -173,7 +196,9 @@ export default function Surprise() {
 
             {/* Celebration Actions */}
             <div className="celebration-card rounded-2xl p-8 text-center">
-              <h3 className="text-xl font-bold mb-6">Keep the Celebration Going! 🎊</h3>
+              <h3 className="text-xl font-bold mb-6">
+                Keep the Celebration Going! 🎊
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button
                   onClick={handleDownload}
@@ -192,7 +217,7 @@ export default function Surprise() {
                   Create Your Own
                 </Button>
               </div>
-              
+
               <div className="mt-6 text-sm text-muted-foreground">
                 ✨ Made with Digital Surprise
               </div>
