@@ -6,7 +6,8 @@ import { setupVite, serveStatic, log } from "./vite";
 const app = express();
 
 app.use(cors({
-  origin: "*" // or set to your Vercel domain for more security
+  origin: "https://digital-surprise.vercel.app",
+  credentials: true
 }));
 
 app.options("*", cors());
