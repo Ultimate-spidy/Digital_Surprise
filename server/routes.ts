@@ -75,6 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate QR code - optimized for speed
       const baseUrl =
         process.env.PUBLIC_URL ||
+        req.get('origin') ||
         `https://digitalsurprise-production.up.railway.app`;
 
       const surpriseUrl = `${baseUrl}/surprise/${slug}`;
