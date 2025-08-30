@@ -2,23 +2,27 @@ import { type Surprise, type InsertSurprise, surprises } from "@shared/schema";
 import { createHash } from "crypto";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: "dfxhtpsmk", // from your dashboard
+  api_key: "digitalSurprise", // from your dashboard
+  api_secret: "WqlAYfzgkpeq3UTJhysUUsI8eLw", // from your dashboard
+});
 
 export interface IStorage {
   createSurprise(surprise: InsertSurprise): Promise<Surprise>;
   getSurpriseBySlug(slug: string): Promise<Surprise | undefined>;
-  saveFile(buffer: Buffer, filename: string): Promise<string>;
-  getFileBuffer(filename: string): Promise<Buffer | undefined>;
-  hashPassword(password: string): string;
-  verifyPassword(password: string, hash: string): boolean;
+  saveFile(
+    buffer: Buffer,
+    originalName: string,
+    mimeType: string,
+  ): Promise<string>;
+  hashPassword(password: string): Promise<string>;
+  verifyPassword(password: string, hash: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
-  private files: Map<string, Buffer>;
-
-  constructor() {
-    this.files = new Map();
-  }
-
   async createSurprise(insertSurprise: InsertSurprise): Promise<Surprise> {
     const [surprise] = await db
       .insert(surprises)
@@ -33,29 +37,32 @@ export class DatabaseStorage implements IStorage {
       .from(surprises)
       .where(eq(surprises.slug, slug))
       .limit(1);
-    
     return surprise || undefined;
   }
 
-  async saveFile(buffer: Buffer, filename: string): Promise<string> {
-    this.files.set(filename, buffer);
-    return filename;
+  async saveFile(
+    buffer: Buffer,
+    originalName: string,
+    mimeType: string,
+  ): Promise<string> {
+    // Convert buffer to base64 string for Cloudinary
+    const base64 = buffer.toString("base64");
+    const uploadStr = `data:${mimeType};base64,${base64}`;
+
+    const result = await cloudinary.uploader.upload(uploadStr, {
+      public_id: originalName, // or use a slug for uniqueness
+      resource_type: "auto", // auto-detect image/video
+      overwrite: true,
+    });
+    return result.secure_url; // public file URL
   }
 
-  async getFileBuffer(filename: string): Promise<Buffer | undefined> {
-    return this.files.get(filename);
+  async hashPassword(password: string): Promise<string> {
+    return createHash("sha256").update(password).digest("hex");
   }
 
-  hashPassword(password: string): string {
-    return createHash('sha256').update(password).digest('hex');
-  }
-
-  verifyPassword(password: string, hash: string): boolean {
+  async verifyPassword(password: string, hash: string): Promise<boolean> {
     return this.hashPassword(password) === hash;
-  }
-
-  generateSlug(): string {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   }
 }
 
