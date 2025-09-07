@@ -4,3 +4,10 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# SSH keys - should not be committed
+*.pem
+*.key
+id_*
+digital
+digital.pub
