@@ -13,7 +13,8 @@
     "vercel-build": "npm run build",
 
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist/public",
+    "deploy:ssh": "./scripts/deploy.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

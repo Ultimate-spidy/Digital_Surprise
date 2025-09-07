@@ -47,3 +47,26 @@ Preferred communication style: Simple, everyday language.
 - **Date Handling**: date-fns for date manipulation and formatting
 - **Class Management**: clsx and tailwind-merge for conditional styling
 - **Icons**: Lucide React for consistent iconography
+
+## Deployment
+
+The application supports multiple deployment methods:
+
+### SSH-based Deployment
+For secure deployment using SSH keys:
+```bash
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/id_ed25519
+npm run deploy:ssh
+```
+
+### GitHub Actions
+Automated deployment on push to main branch using GitHub Actions with SSH key authentication.
+
+### Manual Deployment
+```bash
+npm run build
+npm run deploy
+```
+
+For detailed deployment instructions, see [SSH_DEPLOYMENT.md](docs/SSH_DEPLOYMENT.md).
