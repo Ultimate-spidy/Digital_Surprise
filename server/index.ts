@@ -7,10 +7,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "https://digital-surprise.vercel.app",
-      "https://digitalsurprise-production-58dd.up.railway.app",
-    ],
+    origin: ["https://digital-surprise.onrender.com"],
     credentials: true,
   }),
 );
