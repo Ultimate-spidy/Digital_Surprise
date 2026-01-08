@@ -9,7 +9,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const pool = new Pool({
-  connectionString: "postgresql://postgres:vNQuVxmPjKrvwJpSnZFUpVWhtrmVMVBF@metro.proxy.rlwy.net:31899/railway",
+  connectionString: "mongodb+srv://231210059_db_user:Rashisingh27@ultimatespiderman.mxsmnas.mongodb.net/?appName=ultimateSpiderman",
 });
 
 export const db = drizzle(pool, { schema });
