@@ -26,6 +26,9 @@ export default function Surprise() {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Temporary hardcoded filename for testing (set to null to disable)
+  const hardcodedFilename = null; // "https://res.cloudinary.com/dfxhtpsmk/image/upload/v1768046460/Pbzn4vUMe3R_1768046459680.jpg";
+
   useEffect(() => {
     const path = window.location.pathname;
     const pathSegments = path.split("/");
@@ -43,6 +46,12 @@ export default function Surprise() {
     queryKey: ["/api/surprises", slug],
     enabled: !!slug,
   });
+
+  // Debug logging for API response
+  useEffect(() => {
+    console.log("Surprise Data:", surprise);
+    console.log("Slug used for query:", slug);
+  }, [surprise, slug]);
 
   useEffect(() => {
     if (surprise && surprise.hasPassword && !isUnlocked) {
@@ -157,14 +166,14 @@ export default function Surprise() {
                 >
                   {surprise.mimeType?.startsWith("image/") ? (
                     <img
-                      src={surprise.filename}
+                      src={hardcodedFilename || surprise.filename}
                       alt="Surprise media"
                       className="max-w-full max-h-[600px] object-contain"
                       data-testid="surprise-image"
                     />
                   ) : (
                     <video
-                      src={surprise.filename}
+                      src={hardcodedFilename || surprise.filename}
                       className="max-w-full max-h-[600px] object-contain"
                       controls
                       data-testid="surprise-video"
