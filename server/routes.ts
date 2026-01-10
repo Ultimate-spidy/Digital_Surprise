@@ -106,7 +106,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const surprise = await storage.getSurpriseBySlug(slug);
 
       if (!surprise) {
-        return res.status(404).json({ message: "Surprise not found" });
+        return res.status(404).json({ error: "Surprise Not Found" });
       }
 
       // Don't send the password hash to the client
