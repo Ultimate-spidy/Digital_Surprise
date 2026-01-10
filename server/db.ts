@@ -1,30 +1,24 @@
-// db.ts
-import pkg from "pg";
-const { Pool } = pkg;
-import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "@shared/schema";
+import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
 
-// if (!process.env.DATABASE_URL) {
-//   throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
-// }
+dotenv.config();
 
-// export const pool = new Pool({
-//   connectionString: "mongodb+srv://231210059_db_user:Rashisingh27@ultimatespiderman.mxsmnas.mongodb.net/?appName=ultimateSpiderman",
-// });
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL must be set in the .env file.");
+}
 
 const client = new MongoClient(process.env.DATABASE_URL);
 
-async function connectDB() {
+export async function connectDB() {
   try {
     await client.connect();
-    console.log("Connected to MongoDB at", process.env.DATABASE_URL);
-    return client.db("digital_surprise"); // Database name
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error.message);
+    console.log("✅ Connected to MongoDB successfully.");
+    return client.db("digital_surprise");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("❌ Failed to connect to MongoDB:", errorMessage);
     throw error;
   }
 }
 
 export const db = connectDB();
-
-// export const db = drizzle(pool, { schema });
