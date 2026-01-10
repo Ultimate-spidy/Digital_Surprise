@@ -11,15 +11,22 @@ if (!process.env.CLOUDINARY_URL) {
 }
 
 // Parse CLOUDINARY_URL: cloudinary://api_key:api_secret@cloud_name
-const cloudinaryUrlParts = process.env.CLOUDINARY_URL.split("://")[1]; // Remove cloudinary://
-const [credentials, cloudName] = cloudinaryUrlParts.split("@");
-const [apiKey, apiSecret] = credentials.split(":");
+// const cloudinaryUrlParts = process.env.CLOUDINARY_URL.split("://")[1]; // Remove cloudinary://
+// const [credentials, cloudName] = cloudinaryUrlParts.split("@");
+// const [apiKey, apiSecret] = credentials.split(":");
+
+// cloudinary.config({
+//   cloud_name: cloudName,
+//   api_key: apiKey,
+//   api_secret: apiSecret,
+// });
 
 cloudinary.config({
-  cloud_name: cloudName,
-  api_key: apiKey,
-  api_secret: apiSecret,
+  cloud_name: "dfxhtpsmk", // from your dashboard
+  api_key: "242418512848473", // <-- updated as requested
+  api_secret: "WqlAYfzgkpeq3UTJhysUUsI8eLw", // from your dashboard
 });
+
 
 export async function testCloudinaryConnection() {
   try {
