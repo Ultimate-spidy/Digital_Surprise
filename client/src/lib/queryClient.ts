@@ -18,7 +18,7 @@ export async function apiRequest(
 ): Promise<Response> {
   // In development, always use relative URLs. In production, use Railway backend.
   const isDev = import.meta.env.DEV;
-  const fullUrl = isDev ? url : `${API_BASE_URL}${url}`;
+  const fullUrl = isDev ? url : `${API_BASE_URL}${url.replace(/^\/api/, '')}`;
 
   const res = await fetch(fullUrl, {
     method,
@@ -40,7 +40,7 @@ export const getQueryFn: <T>(options: {
     const url = queryKey.join("/") as string;
     // In development, always use relative URLs. In production, use Railway backend.
     const isDev = import.meta.env.DEV;
-    const fullUrl = isDev ? url : `${API_BASE_URL}${url}`;
+    const fullUrl = isDev ? url : `${API_BASE_URL}${url.replace(/^\/api/, '')}`;
 
     const res = await fetch(fullUrl, {
       credentials: "include",
