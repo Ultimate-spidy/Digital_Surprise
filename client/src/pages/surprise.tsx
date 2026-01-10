@@ -31,8 +31,14 @@ export default function Surprise() {
 
   useEffect(() => {
     const path = window.location.pathname;
+    console.log("URL path:", path);
+
     const pathSegments = path.split("/");
+    console.log("Path Segments:", pathSegments);
+
     const surpriseSlug = pathSegments[pathSegments.length - 1];
+    console.log("Extracted Slug:", surpriseSlug);
+
     if (surpriseSlug) {
       setSlug(surpriseSlug);
     }
@@ -46,6 +52,9 @@ export default function Surprise() {
     queryKey: ["/api/surprises", slug],
     enabled: !!slug,
   });
+
+  console.log("Surprise Data from API:", surprise);
+  console.log("Slug used for the query:", slug);
 
   // Debug logging for API response
   useEffect(() => {
