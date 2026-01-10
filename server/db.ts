@@ -8,8 +8,23 @@ import * as schema from "@shared/schema";
 //   throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
 // }
 
-export const pool = new Pool({
-  connectionString: "mongodb+srv://231210059_db_user:Rashisingh27@ultimatespiderman.mxsmnas.mongodb.net/?appName=ultimateSpiderman",
-});
+// export const pool = new Pool({
+//   connectionString: "mongodb+srv://231210059_db_user:Rashisingh27@ultimatespiderman.mxsmnas.mongodb.net/?appName=ultimateSpiderman",
+// });
 
-export const db = drizzle(pool, { schema });
+const client = new MongoClient(process.env.DATABASE_URL);
+
+async function connectDB() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB at", process.env.DATABASE_URL);
+    return client.db("digital_surprise"); // Database name
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error.message);
+    throw error;
+  }
+}
+
+export const db = connectDB();
+
+// export const db = drizzle(pool, { schema });
