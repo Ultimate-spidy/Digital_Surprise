@@ -21,6 +21,8 @@ type SurpriseData = {
 export default function Surprise() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  // For debugging: temporarily hardcode a slug value here (e.g., "Pbzn4vUMe3R_")
+  // If hardcoding resolves rendering issues, the problem is in the dynamic extraction logic
   const [slug, setSlug] = useState<string | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
