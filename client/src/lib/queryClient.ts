@@ -9,7 +9,7 @@ async function throwIfResNotOk(res: Response) {
 
 const API_BASE_URL = import.meta.env.DEV 
   ? "/api" 
-  : "https://digitalsurprise-production.up.railway.app/api";
+  : "https://digital-surprise.onrender.com/api";
 
 export async function apiRequest(
   method: string,
