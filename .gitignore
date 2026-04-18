@@ -8,6 +8,8 @@ vite.config.ts.*
 # Environment variables
 .env
 .env.local
+.env.production
+.env.development
 .env.*.local
 
 # Private SSH Keys (user keys)
@@ -17,3 +19,6 @@ id_ed25519
 id_ed25519.pub
 *.pem
 .ssh/
+
+# Local pasted/code scratch artifacts that may contain sensitive data
+attached_assets/Pasted-*.txt

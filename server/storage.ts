@@ -1,5 +1,5 @@
 import { type Surprise, type InsertSurprise } from "@shared/schema";
-import { createHash } from "crypto";
+import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import { connectDB } from "./db";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
@@ -10,22 +10,37 @@ if (!process.env.CLOUDINARY_URL) {
   throw new Error("CLOUDINARY_URL must be set in the .env file.");
 }
 
-// Parse CLOUDINARY_URL: cloudinary://api_key:api_secret@cloud_name
-// const cloudinaryUrlParts = process.env.CLOUDINARY_URL.split("://")[1]; // Remove cloudinary://
-// const [credentials, cloudName] = cloudinaryUrlParts.split("@");
-// const [apiKey, apiSecret] = credentials.split(":");
-
-// cloudinary.config({
-//   cloud_name: cloudName,
-//   api_key: apiKey,
-//   api_secret: apiSecret,
-// });
+const cloudinaryUrl = new URL(process.env.CLOUDINARY_URL);
+if (
+  cloudinaryUrl.protocol !== "cloudinary:" ||
+  !cloudinaryUrl.username ||
+  !cloudinaryUrl.password ||
+  !cloudinaryUrl.hostname
+) {
+  throw new Error(
+    "CLOUDINARY_URL format is invalid. Expected: cloudinary://api_key:api_secret@cloud_name",
+  );
+}
 
 cloudinary.config({
-  cloud_name: "<cloud_name>", // from your dashboard
-  api_key: "<api_key>", // <-- updated as requested
-  api_secret: "<api_secret>", // from your dashboard
+  cloud_name: cloudinaryUrl.hostname,
+  api_key: decodeURIComponent(cloudinaryUrl.username),
+  api_secret: decodeURIComponent(cloudinaryUrl.password),
 });
+
+const PASSWORD_KEYLEN = 64;
+const PASSWORD_SALT_BYTES = 16;
+
+function compareHexStringsSafe(aHex: string, bHex: string): boolean {
+  const aBuffer = Buffer.from(aHex, "hex");
+  const bBuffer = Buffer.from(bHex, "hex");
+
+  if (aBuffer.length !== bBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(aBuffer, bBuffer);
+}
 
 
 export async function testCloudinaryConnection() {
@@ -42,6 +57,7 @@ export async function testCloudinaryConnection() {
 export interface IStorage {
   createSurprise(surprise: InsertSurprise): Promise<Surprise>;
   getSurpriseBySlug(slug: string): Promise<Surprise | undefined>;
+  updateSurprisePasswordBySlug(slug: string, password: string): Promise<void>;
   saveFile(
     buffer: Buffer,
     originalName: string,
@@ -82,6 +98,16 @@ export class DatabaseStorage implements IStorage {
     } as any as Surprise;
   }
 
+  async updateSurprisePasswordBySlug(
+    slug: string,
+    password: string,
+  ): Promise<void> {
+    const db = await connectDB();
+    const collection = db.collection("surprises");
+
+    await collection.updateOne({ slug }, { $set: { password } });
+  }
+
   async saveFile(
     buffer: Buffer,
     originalName: string,
@@ -105,12 +131,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async hashPassword(password: string): Promise<string> {
-    return createHash("sha256").update(password).digest("hex");
+    const salt = randomBytes(PASSWORD_SALT_BYTES).toString("hex");
+    const derivedKey = scryptSync(password, salt, PASSWORD_KEYLEN).toString("hex");
+    return `scrypt:${salt}:${derivedKey}`;
   }
 
   async verifyPassword(password: string, hash: string): Promise<boolean> {
-    const hashedInput = await this.hashPassword(password);
-    return hashedInput === hash;
+    if (hash.startsWith("scrypt:")) {
+      const [, salt, expectedDerivedKey] = hash.split(":");
+
+      if (!salt || !expectedDerivedKey) {
+        return false;
+      }
+
+      const providedDerivedKey = scryptSync(
+        password,
+        salt,
+        PASSWORD_KEYLEN,
+      ).toString("hex");
+      return compareHexStringsSafe(providedDerivedKey, expectedDerivedKey);
+    }
+
+    return false;
   }
 }
 

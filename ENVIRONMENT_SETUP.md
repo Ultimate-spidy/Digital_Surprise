@@ -40,6 +40,14 @@ NODE_ENV=production
 PORT=3000
 ```
 
+## Security Warning
+
+If real credentials were ever committed to Git history, rotate them immediately in your providers:
+- MongoDB Atlas database user password
+- Cloudinary API key/secret
+
+Then rewrite Git history to purge leaked values before pushing again.
+
 After updating environment variables in Render, restart the service for changes to take effect.
 
 ## Testing Connections

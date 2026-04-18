@@ -21,15 +21,12 @@ type SurpriseData = {
 export default function Surprise() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  // For debugging: temporarily hardcode a slug value here (e.g., "Pbzn4vUMe3R_")
-  // If hardcoding resolves rendering issues, the problem is in the dynamic extraction logic
   const [slug, setSlug] = useState<string | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Temporary hardcoded filename for testing (set to null to disable)
-  const hardcodedFilename = null; // "https://res.cloudinary.com/<cloud_name>/image/upload/v1768046460/Pbzn4vUMe3R_1768046459680.jpg";
+  const hardcodedFilename = null;
 
   useEffect(() => {
     const path = window.location.pathname;

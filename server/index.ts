@@ -1,18 +1,26 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+const corsOptions = {
+  origin: process.env.PUBLIC_URL || "https://digital-surprise.onrender.com",
+  credentials: true,
+};
 
 app.use(
-  cors({
-    origin: ["https://digital-surprise.onrender.com"],
-    credentials: true,
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   }),
 );
 
-app.options("*", cors());
+app.use(
+  cors(corsOptions),
+);
+
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

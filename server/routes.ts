@@ -9,6 +9,17 @@ import { nanoid } from "nanoid";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+  fileFilter: (_req, file, cb) => {
+    if (
+      file.mimetype.startsWith("image/") ||
+      file.mimetype.startsWith("video/")
+    ) {
+      cb(null, true);
+      return;
+    }
+
+    cb(new Error("Only image and video files are allowed"));
+  },
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -29,7 +40,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create a surprise
   app.post("/api/surprises", upload.single("file"), async (req, res) => {
-    console.log("Incoming upload:", req.headers["content-length"]);
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -41,14 +51,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Message is required" });
       }
 
-      // Validate file type
-      if (
-        !req.file.mimetype.startsWith("image/") &&
-        !req.file.mimetype.startsWith("video/")
-      ) {
+      if (message.trim().length > 2000) {
         return res
           .status(400)
-          .json({ message: "Only image and video files are allowed" });
+          .json({ message: "Message must be 2000 characters or less" });
+      }
+
+      if (password && password.length > 128) {
+        return res
+          .status(400)
+          .json({ message: "Password must be 128 characters or less" });
       }
 
       const slug = nanoid(12);
@@ -75,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate QR code - optimized for speed
       const baseUrl =
         process.env.PUBLIC_URL ||
-        req.get('origin') ||
+        req.get("origin") ||
         `https://digital-surprise.onrender.com`;
 
       const surpriseUrl = `${baseUrl}/surprise/${slug}`;
@@ -149,6 +161,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (!isValid) {
         return res.status(401).json({ message: "Invalid password" });
+      }
+
+      if (!surprise.password.startsWith("scrypt:")) {
+        await storage.updateSurprisePasswordBySlug(
+          slug,
+          await storage.hashPassword(password),
+        );
       }
 
       res.json({ success: true });
